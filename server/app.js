@@ -1,0 +1,26 @@
+import express from "express";
+import cors from "cors";
+import { notFound, errorHandler } from "./middleware/errorHandler.js";
+
+const app = express();
+
+// Allow the React app to call this API
+app.use(cors({ origin: process.env.CLIENT_URL }));
+
+// Parse JSON request bodies into req.body
+app.use(express.json());
+
+// Health check route: used to test that the API is running
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    message: "AcademicTrack API is running",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Must stay LAST: 404 handler, then the error handler
+app.use(notFound);
+app.use(errorHandler);
+
+export default app;
