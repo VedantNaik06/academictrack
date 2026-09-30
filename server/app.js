@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
 
@@ -18,6 +19,9 @@ app.get("/api/health", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// API routes
+app.use("/api/auth", authRoutes);
 
 // Must stay LAST: 404 handler, then the error handler
 app.use(notFound);

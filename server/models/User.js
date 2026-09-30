@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 import { ROLES, USER_STATUS } from "../utils/constants.js";
 
 const userSchema = new mongoose.Schema(
@@ -55,6 +56,18 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Runs automatically before a user is saved.
+// Hashes the password only when it is new or changed.
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+  this.password = await bcrypt.hash(this.password, 10); // 10 = salt rounds
+});
+
+// Compares a typed password with the stored hash
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 const User = mongoose.model("User", userSchema);
 export default User;
