@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import Alert from "../components/Alert";
 import { ROLE_HOME } from "../utils/roles";
+
+const FEATURES = [
+  "Digital syllabus and lecture-wise planning",
+  "Daily teaching reports in under a minute",
+  "Automatic progress for every unit and subject",
+  "One live dashboard for the HOD",
+];
 
 function Login() {
   const { user, login } = useAuth();
@@ -11,6 +19,7 @@ function Login() {
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Already logged in -> skip the login page
   if (user) {
@@ -53,59 +62,116 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-slate-800 text-center">
-          AcademicTrack
-        </h1>
-        <p className="text-slate-500 text-center mb-6">
-          Sign in with your ID and password
-        </p>
+    <div className="grid min-h-screen lg:grid-cols-2">
+      {/* Brand panel: desktop only */}
+      <div
+        className="hidden flex-col justify-between p-12 text-white lg:flex"
+        style={{ backgroundImage: "linear-gradient(135deg, #4338ca, #1e1b4b)" }}
+      >
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/15 text-xl font-bold">
+            A
+          </span>
+          <span className="text-xl font-semibold">AcademicTrack</span>
+        </div>
 
-        {serverError && (
-          <p className="rounded bg-red-100 text-red-700 p-3 mb-4 text-sm">
-            {serverError}
+        <div>
+          <h2 className="text-4xl font-bold leading-tight">
+            Plan it. Teach it.
+            <br />
+            Track it automatically.
+          </h2>
+          <p className="mt-4 max-w-md text-indigo-100">
+            A centralized academic planning and teaching progress management
+            system for departments, faculty and HODs.
           </p>
-        )}
+          <ul className="mt-8 space-y-3 text-sm text-indigo-50">
+            {FEATURES.map((feature) => (
+              <li key={feature} className="flex items-center gap-3">
+                <span className="h-1.5 w-1.5 rounded-full bg-indigo-300" />
+                {feature}
+              </li>
+            ))}
+          </ul>
+        </div>
 
-        <form onSubmit={handleSubmit} noValidate>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            User ID
-          </label>
-          <input
-            type="text"
-            name="userId"
-            value={form.userId}
-            onChange={handleChange}
-            placeholder="e.g. CSE-FAC-001"
-            className="w-full border border-slate-300 rounded px-3 py-2 mb-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {errors.userId && (
-            <p className="text-red-600 text-sm mb-2">{errors.userId}</p>
-          )}
+        <p className="text-xs text-indigo-200">College Project | MERN Stack</p>
+      </div>
 
-          <label className="block text-sm font-medium text-slate-700 mb-1 mt-3">
-            Password
-          </label>
-          <input
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            className="w-full border border-slate-300 rounded px-3 py-2 mb-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {errors.password && (
-            <p className="text-red-600 text-sm mb-2">{errors.password}</p>
-          )}
+      {/* Form panel */}
+      <div className="flex items-center justify-center p-6 sm:p-12">
+        <div className="w-full max-w-md">
+          {/* Small logo for phones */}
+          <div className="mb-8 flex items-center justify-center gap-3 lg:hidden">
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-xl font-bold text-white">
+              A
+            </span>
+            <span className="text-xl font-semibold text-slate-900">
+              AcademicTrack
+            </span>
+          </div>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full mt-5 bg-blue-600 text-white rounded py-2 font-medium hover:bg-blue-700 disabled:opacity-60"
-          >
-            {submitting ? "Signing in..." : "Sign in"}
-          </button>
-        </form>
+          <div className="card p-6 sm:p-8">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+              Sign in
+            </h1>
+            <p className="mb-6 mt-1 text-sm text-slate-500">
+              Enter your ID and password to continue.
+            </p>
+
+            <Alert type="error" message={serverError} />
+
+            <form onSubmit={handleSubmit} noValidate>
+              <label htmlFor="userId" className="label">
+                User ID
+              </label>
+              <input
+                id="userId"
+                type="text"
+                name="userId"
+                value={form.userId}
+                onChange={handleChange}
+                placeholder="e.g. CSE-FAC-001"
+                autoComplete="username"
+                className="input"
+              />
+              {errors.userId && <p className="field-error">{errors.userId}</p>}
+
+              <label htmlFor="password" className="label mt-4">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  autoComplete="current-password"
+                  className="input pr-16"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 px-3 text-xs font-medium text-slate-500 hover:text-indigo-600"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="field-error">{errors.password}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="btn btn-primary mt-6 w-full py-2.5"
+              >
+                {submitting ? "Signing in..." : "Sign in"}
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import Modal from "../../components/Modal";
 import Alert from "../../components/Alert";
+import Icon from "../../components/Icon";
+import PageHeader from "../../components/PageHeader";
+import Spinner from "../../components/Spinner";
+import EmptyState from "../../components/EmptyState";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import { getDepartments } from "../../services/departmentService";
 import {
@@ -38,7 +42,6 @@ function AcademicYears() {
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
 
-  // Load academic years + departments (for the dropdowns)
   useEffect(() => {
     const load = async () => {
       try {
@@ -75,7 +78,7 @@ function AcademicYears() {
       department: record.department._id,
       academicYear: record.academicYear,
       semester: String(record.semester),
-      startDate: record.startDate.slice(0, 10), // "2026-07-01" for <input type="date">
+      startDate: record.startDate.slice(0, 10),
       endDate: record.endDate.slice(0, 10),
     });
     setFormErrors({});
@@ -83,7 +86,8 @@ function AcademicYears() {
     setShowModal(true);
   };
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const validate = () => {
     const errors = {};
@@ -145,92 +149,110 @@ function AcademicYears() {
     }
   };
 
-  const inputClass =
-    "w-full rounded border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500";
-
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold text-slate-800">Academic Years</h1>
-        <div className="flex items-center gap-3">
-          <select
-            value={filterDept}
-            onChange={(e) => setFilterDept(e.target.value)}
-            className="rounded border border-slate-300 px-3 py-2 text-sm"
-          >
-            <option value="">All departments</option>
-            {departments.map((d) => (
-              <option key={d._id} value={d._id}>
-                {d.code}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={openAdd}
-            className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            + Add Academic Year
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="Academic Years"
+        subtitle={loading ? "" : `${academicYears.length} record(s)`}
+      >
+        <select
+          value={filterDept}
+          onChange={(e) => setFilterDept(e.target.value)}
+          className="input w-full sm:w-48"
+          aria-label="Filter by department"
+        >
+          <option value="">All departments</option>
+          {departments.map((d) => (
+            <option key={d._id} value={d._id}>
+              {d.code}
+            </option>
+          ))}
+        </select>
+        <button onClick={openAdd} className="btn btn-primary">
+          <Icon name="plus" className="h-4 w-4" />
+          Add Academic Year
+        </button>
+      </PageHeader>
 
       <Alert type="success" message={success} />
       <Alert type="error" message={error} />
 
-      <div className="overflow-x-auto rounded-xl bg-white shadow">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-slate-50 text-slate-600">
-            <tr>
-              <th className="px-4 py-3">Academic Year</th>
-              <th className="px-4 py-3">Semester</th>
-              <th className="px-4 py-3">Department</th>
-              <th className="px-4 py-3">Start</th>
-              <th className="px-4 py-3">End</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan="6" className="px-4 py-6 text-center text-slate-500">
-                  Loading...
-                </td>
-              </tr>
-            )}
-
-            {!loading && academicYears.length === 0 && (
-              <tr>
-                <td colSpan="6" className="px-4 py-6 text-center text-slate-500">
-                  No academic years found.
-                </td>
-              </tr>
-            )}
-
-            {academicYears.map((record) => (
-              <tr key={record._id} className="border-t">
-                <td className="px-4 py-3 font-medium">{record.academicYear}</td>
-                <td className="px-4 py-3">Semester {record.semester}</td>
-                <td className="px-4 py-3">{record.department.code}</td>
-                <td className="px-4 py-3">{formatDate(record.startDate)}</td>
-                <td className="px-4 py-3">{formatDate(record.endDate)}</td>
-                <td className="px-4 py-3 text-right">
-                  <button
-                    onClick={() => openEdit(record)}
-                    className="mr-3 text-blue-600 hover:underline"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(record)}
-                    className="text-red-600 hover:underline"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="card overflow-hidden">
+        {loading ? (
+          <Spinner />
+        ) : academicYears.length === 0 ? (
+          <EmptyState
+            title="No academic years found"
+            text='Click "Add Academic Year" to create one.'
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="border-b border-slate-200 bg-slate-50">
+                <tr>
+                  <th className="th">Academic Year</th>
+                  <th className="th">Semester</th>
+                  <th className="th">Dept</th>
+                  <th className="th hidden md:table-cell">Start</th>
+                  <th className="th hidden md:table-cell">End</th>
+                  <th className="th text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {academicYears.map((record) => (
+                  <tr key={record._id} className="hover:bg-slate-50/70">
+                    <td className="td">
+                      <p className="font-medium text-slate-900">
+                        {record.academicYear}
+                      </p>
+                      {/* On phones the dates move under the year */}
+                      <p className="mt-0.5 text-xs text-slate-500 md:hidden">
+                        {formatDate(record.startDate)} to{" "}
+                        {formatDate(record.endDate)}
+                      </p>
+                    </td>
+                    <td className="td">
+                      <span className="badge bg-slate-100 text-slate-700">
+                        Sem {record.semester}
+                      </span>
+                    </td>
+                    <td className="td">
+                      <span className="badge bg-indigo-50 text-indigo-700">
+                        {record.department.code}
+                      </span>
+                    </td>
+                    <td className="td hidden md:table-cell">
+                      {formatDate(record.startDate)}
+                    </td>
+                    <td className="td hidden md:table-cell">
+                      {formatDate(record.endDate)}
+                    </td>
+                    <td className="td">
+                      <div className="flex justify-end gap-1">
+                        <button
+                          onClick={() => openEdit(record)}
+                          className="icon-btn hover:text-indigo-600"
+                          aria-label="Edit academic year"
+                          title="Edit"
+                        >
+                          <Icon name="edit" className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(record)}
+                          className="icon-btn hover:bg-red-50 hover:text-red-600"
+                          aria-label="Delete academic year"
+                          title="Delete"
+                        >
+                          <Icon name="trash" className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {showModal && (
@@ -240,14 +262,15 @@ function AcademicYears() {
         >
           <Alert type="error" message={formError} />
           <form onSubmit={handleSubmit} noValidate>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="department" className="label">
               Department
             </label>
             <select
+              id="department"
               name="department"
               value={form.department}
               onChange={handleChange}
-              className={inputClass}
+              className="input"
             >
               <option value="">Select department</option>
               {departments.map((d) => (
@@ -257,72 +280,81 @@ function AcademicYears() {
               ))}
             </select>
             {formErrors.department && (
-              <p className="mt-1 text-sm text-red-600">{formErrors.department}</p>
+              <p className="field-error">{formErrors.department}</p>
             )}
 
-            <label className="mb-1 mt-4 block text-sm font-medium text-slate-700">
-              Academic year
-            </label>
-            <input
-              name="academicYear"
-              value={form.academicYear}
-              onChange={handleChange}
-              placeholder="2026-27"
-              className={inputClass}
-            />
-            {formErrors.academicYear && (
-              <p className="mt-1 text-sm text-red-600">{formErrors.academicYear}</p>
-            )}
-
-            <label className="mb-1 mt-4 block text-sm font-medium text-slate-700">
-              Semester
-            </label>
-            <select
-              name="semester"
-              value={form.semester}
-              onChange={handleChange}
-              className={inputClass}
-            >
-              <option value="">Select semester</option>
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                <option key={n} value={n}>
-                  Semester {n}
-                </option>
-              ))}
-            </select>
-            {formErrors.semester && (
-              <p className="mt-1 text-sm text-red-600">{formErrors.semester}</p>
-            )}
-
-            <div className="mt-4 grid grid-cols-2 gap-4">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">
+                <label htmlFor="academicYear" className="label">
+                  Academic year
+                </label>
+                <input
+                  id="academicYear"
+                  name="academicYear"
+                  value={form.academicYear}
+                  onChange={handleChange}
+                  placeholder="2026-27"
+                  className="input"
+                />
+                {formErrors.academicYear && (
+                  <p className="field-error">{formErrors.academicYear}</p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="semester" className="label">
+                  Semester
+                </label>
+                <select
+                  id="semester"
+                  name="semester"
+                  value={form.semester}
+                  onChange={handleChange}
+                  className="input"
+                >
+                  <option value="">Select semester</option>
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                    <option key={n} value={n}>
+                      Semester {n}
+                    </option>
+                  ))}
+                </select>
+                {formErrors.semester && (
+                  <p className="field-error">{formErrors.semester}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label htmlFor="startDate" className="label">
                   Start date
                 </label>
                 <input
+                  id="startDate"
                   type="date"
                   name="startDate"
                   value={form.startDate}
                   onChange={handleChange}
-                  className={inputClass}
+                  className="input"
                 />
                 {formErrors.startDate && (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.startDate}</p>
+                  <p className="field-error">{formErrors.startDate}</p>
                 )}
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">
+                <label htmlFor="endDate" className="label">
                   End date
                 </label>
                 <input
+                  id="endDate"
                   type="date"
                   name="endDate"
                   value={form.endDate}
                   onChange={handleChange}
-                  className={inputClass}
+                  className="input"
                 />
                 {formErrors.endDate && (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.endDate}</p>
+                  <p className="field-error">{formErrors.endDate}</p>
                 )}
               </div>
             </div>
@@ -331,15 +363,11 @@ function AcademicYears() {
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="rounded border px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                className="btn btn-secondary"
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                disabled={saving}
-                className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
-              >
+              <button type="submit" disabled={saving} className="btn btn-primary">
                 {saving ? "Saving..." : editing ? "Update" : "Create"}
               </button>
             </div>
