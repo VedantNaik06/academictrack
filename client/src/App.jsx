@@ -10,6 +10,8 @@ import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Departments from "./pages/admin/Departments";
 import AcademicYears from "./pages/admin/AcademicYears";
+import FacultyManagement from "./pages/admin/FacultyManagement";
+import HodManagement from "./pages/admin/HodManagement";
 import FacultyDashboard from "./pages/faculty/FacultyDashboard";
 import HodDashboard from "./pages/hod/HodDashboard";
 
@@ -34,6 +36,8 @@ function App() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/departments" element={<Departments />} />
           <Route path="/admin/academic-years" element={<AcademicYears />} />
+          <Route path="/admin/faculty" element={<FacultyManagement />} />
+          <Route path="/admin/hods" element={<HodManagement />} />
         </Route>
       </Route>
 

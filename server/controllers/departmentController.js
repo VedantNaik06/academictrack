@@ -4,7 +4,7 @@ import Subject from "../models/Subject.js";
 import AcademicYear from "../models/AcademicYear.js";
 import ApiError from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
-import { ROLES } from "../utils/constants.js";
+import { ROLES, USER_STATUS } from "../utils/constants.js";
 
 // GET /api/departments   (admin: all, HOD: only their own department)
 export const getDepartments = asyncHandler(async (req, res) => {
@@ -42,6 +42,38 @@ export const updateDepartment = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: "Department updated successfully",
+    department,
+  });
+});
+
+// PUT /api/departments/:id/hod   (admin)  body: { hod: "<userId>" | null }
+export const assignHod = asyncHandler(async (req, res) => {
+  const department = await Department.findById(req.params.id);
+  if (!department) throw new ApiError(404, "Department not found");
+
+  const { hod } = req.body;
+
+  if (hod) {
+    const hodUser = await User.findOne({
+      _id: hod,
+      role: ROLES.HOD,
+      status: USER_STATUS.ACTIVE,
+    });
+    if (!hodUser) throw new ApiError(404, "Active HOD not found");
+
+    // A HOD can only lead the department they belong to
+    if (String(hodUser.department) !== String(department._id)) {
+      throw new ApiError(400, "This HOD belongs to a different department");
+    }
+  }
+
+  department.hod = hod || null;
+  await department.save();
+  await department.populate("hod", "name userId");
+
+  res.json({
+    success: true,
+    message: hod ? "HOD assigned successfully" : "HOD removed from department",
     department,
   });
 });

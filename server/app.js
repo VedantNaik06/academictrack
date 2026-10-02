@@ -4,6 +4,7 @@ import { notFound, errorHandler } from "./middleware/errorHandler.js";
 import authRoutes from "./routes/authRoutes.js";
 import departmentRoutes from "./routes/departmentRoutes.js";
 import academicYearRoutes from "./routes/academicYearRoutes.js";
+import { facultyRoutes, hodRoutes } from "./routes/userRoutes.js";
 
 const app = express();
 
@@ -26,6 +27,8 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/academic-years", academicYearRoutes);
+app.use("/api/faculty", facultyRoutes);
+app.use("/api/hods", hodRoutes);
 
 // Must stay LAST: 404 handler, then the error handler
 app.use(notFound);
