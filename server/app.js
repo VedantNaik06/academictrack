@@ -5,6 +5,10 @@ import authRoutes from "./routes/authRoutes.js";
 import departmentRoutes from "./routes/departmentRoutes.js";
 import academicYearRoutes from "./routes/academicYearRoutes.js";
 import { facultyRoutes, hodRoutes } from "./routes/userRoutes.js";
+import subjectRoutes from "./routes/subjectRoutes.js";
+import assignmentRoutes from "./routes/assignmentRoutes.js";
+import syllabusRoutes from "./routes/syllabusRoutes.js";
+import lecturePlanRoutes from "./routes/lecturePlanRoutes.js";
 
 const app = express();
 
@@ -29,6 +33,10 @@ app.use("/api/departments", departmentRoutes);
 app.use("/api/academic-years", academicYearRoutes);
 app.use("/api/faculty", facultyRoutes);
 app.use("/api/hods", hodRoutes);
+app.use("/api/subjects", subjectRoutes);
+app.use("/api/assignments", assignmentRoutes);
+app.use("/api/syllabus", syllabusRoutes);
+app.use("/api/lecture-plans", lecturePlanRoutes);
 
 // Must stay LAST: 404 handler, then the error handler
 app.use(notFound);

@@ -12,6 +12,10 @@ import Departments from "./pages/admin/Departments";
 import AcademicYears from "./pages/admin/AcademicYears";
 import FacultyManagement from "./pages/admin/FacultyManagement";
 import HodManagement from "./pages/admin/HodManagement";
+import Subjects from "./pages/admin/Subjects";
+import Assignments from "./pages/admin/Assignments";
+import SyllabusManagement from "./pages/admin/SyllabusManagement";
+import LecturePlans from "./pages/admin/LecturePlans";
 import FacultyDashboard from "./pages/faculty/FacultyDashboard";
 import HodDashboard from "./pages/hod/HodDashboard";
 
@@ -38,6 +42,10 @@ function App() {
           <Route path="/admin/academic-years" element={<AcademicYears />} />
           <Route path="/admin/faculty" element={<FacultyManagement />} />
           <Route path="/admin/hods" element={<HodManagement />} />
+          <Route path="/admin/subjects" element={<Subjects />} />
+          <Route path="/admin/assignments" element={<Assignments />} />
+          <Route path="/admin/syllabus" element={<SyllabusManagement />} />
+          <Route path="/admin/lecture-plans" element={<LecturePlans />} />
         </Route>
       </Route>
 
